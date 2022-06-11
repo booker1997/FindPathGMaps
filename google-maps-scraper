@@ -1,0 +1,40 @@
+from selenium import webdriver
+
+chromedrive_path = '/Users/bookerschelhaas/Desktop/Code For fun/chromedriver' # use the path to the driver you downloaded from previous steps
+driver = webdriver.Chrome(chromedrive_path)
+url = 'https://www.google.com/maps/@-23.61706,-46.7304252,12z/data=!4m3!11m2!2s1Rw1gIN0SEkHuw1WBP9X-clVX4p0!3e3'
+#class names are KPxkLd and fKEVAc
+driver.get(url)
+address_list = []
+addresses_raw_1 = driver.find_elements_by_class_name('fKEVAc')
+#addresses_raw_2 = driver.find_elements_by_class_name('KPxkLd')
+
+for elem in addresses_raw_1:
+    address_list.append(elem.text)
+print(address_list)
+  
+
+# text = requests.get(url).text
+# soup = BeautifulSoup(text)
+# print(soup)
+# selector = Selector(text=text)
+# path = selector.xpath('//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[5]/div[1]/div[2]/div[1]/div[2]/span[6]').get()
+# print(path)
+# for p in path:  # extracts all <p> inside
+#     print(p)
+# #driver.get(url)
+# ##page_content = driver.page_source
+# #response = Selector(text = page_content)
+# #title = Selector.xpath('//title/text()')
+# print('title',title)
+# results = []
+
+# for el in response.xpath('//div[contains(@aria-label, "Results for")]/div/div[./a]'):
+#     results.append({
+#         'link': el.xpath('./a/@href').extract_first(''),
+#         'title': el.xpath('./a/@aria-label').extract_first('')
+#     })
+
+# print(results)
+
+driver.quit()

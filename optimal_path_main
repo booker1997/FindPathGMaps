@@ -1,0 +1,92 @@
+from utils import Node
+from utils import get_address_list_from_website
+from utils import load_map
+from utils import get_best_path
+from utils import get_best_path_a_star
+from utils import directed_dfs
+from utils import add_hueristics_to_graph
+from utils import nearest_neighbor
+from utils import Digraph
+from utils import convert_time
+from utils import get_best_path_dynamic_programming
+import time
+import AppKit
+
+
+def initialize(run_test_case):
+    
+
+    
+    g_maps_list_url = 'https://www.google.com/maps/@42.3709021,-71.1095115,15z/data=!3m1!4b1!4m3!11m2!2stVTcJYoYcOTruFzsupgOF6XCGGzOsw!3e3' # Boston
+    #g_maps_list_url = 'https://www.google.com/maps/@-22.0056497,-47.9006292,16z/data=!3m1!4b1!4m3!11m2!2sGKyadKDUQvaFDAVbBfOC5g!3e3' # SAO CARLOS
+    #g_maps_list_url = 'https://www.google.com/maps/@-23.6170286,-46.7304253,12z/data=!4m3!11m2!2s1Rw1gIN0SEkHuw1WBP9X-clVX4p0!3e3' # SAO PAULO
+    
+    
+
+    if not run_test_case:
+        g_maps_list_url = input("Please paste the url for your google maps list here: ")
+    else:
+        AppKit.NSBeep()
+        which = input('Which city list do you want to use as your test? type boston or sao carlos:')
+        map_url_dict = {'sao carlos':'https://www.google.com/maps/@-22.0056497,-47.9006292,16z/data=!3m1!4b1!4m3!11m2!2sGKyadKDUQvaFDAVbBfOC5g!3e3','boston':'https://www.google.com/maps/@42.3709021,-71.1095115,15z/data=!3m1!4b1!4m3!11m2!2stVTcJYoYcOTruFzsupgOF6XCGGzOsw!3e3'}
+        g_maps_list_url = map_url_dict[which]
+    restricted_trans_methods = ['transit','bicycling','driving']
+    address_list,formatted_addresses_dict = get_address_list_from_website(g_maps_list_url)
+
+    AppKit.NSBeep()
+    start_address = input("Please paste the full address of your starting point here: ")
+    start_address_name = input('What name would you like to give this place? Type here: ')
+    print()
+    address_list.append(start_address)
+    formatted_addresses_dict[start_address] = start_address_name
+    start = Node(start_address,formatted_addresses_dict[start_address])
+    end = Node(start_address,formatted_addresses_dict[start_address])
+    return start,end,address_list, formatted_addresses_dict, restricted_trans_methods
+
+run_test_case = True
+start,end,address_list, formatted_addresses_dict, restricted_trans_methods = initialize(run_test_case)
+print(address_list)
+
+if len(address_list) <10:
+    T_graph = load_map(address_list,formatted_addresses_dict,restricted_trans_methods = restricted_trans_methods)
+    #T_graph_huer = add_hueristics_to_graph(T_graph,start,end)
+    start_t = time.time()
+    best_path, best_time = directed_dfs(T_graph,start,end,algorithm = get_best_path)
+    end_t = time.time()
+    i = 1
+    print()
+    print('The search funciton took: ', convert_time(end_t-start_t))
+    print()
+    print("You should visit the places in the following order:")
+    j = 1
+    for place in best_path:
+        
+        print(str(i) + '.',place)
+        #print(str(i) + '.',place, 'durartion: ',convert_time(best_path[place]))
+        i +=1
+
+    print("Your journey will take: ", convert_time(best_time))
+    
+# elif len(address_list) <20:
+#     T_graph = load_map(address_list,formatted_addresses_dict,restricted_trans_methods = restricted_trans_methods)
+#     cost = get_best_path_dynamic_programming(T_graph,start,list(T_graph.get_nodes()))
+#     print(f'cost= {convert_time(cost)}')
+
+else:
+    #T_graph = load_map(address_list,formatted_addresses_dict,restricted_trans_methods = ['transit','bicycling','driving'])
+    #T_graph_huer = add_hueristics_to_graph(T_graph,start,end)
+    T_graph = Digraph()
+    start_t = time.time()
+    best_path, best_time = nearest_neighbor(T_graph,start,end,address_list,formatted_addresses_dict,restricted_trans_methods)
+    end_t = time.time()
+    i = 1
+    print()
+    print('The search funciton took: ', convert_time(end_t-start_t))
+    print()
+    print("You should visit the places in the following order:")
+    for place in best_path:
+        
+        print(str(i) + '.',place)
+        #print(str(i) + '.',place, 'durartion: ',convert_time(best_path[place]))
+        i +=1
+    print("Your journey will take: ", convert_time(best_time))
